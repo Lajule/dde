@@ -5,19 +5,19 @@ VERSION := 0.0.0
 TARGETS := all run debug watch test bootstrap lint format clean clean-test
 
 all:
-	go build -ldflags="-s -X 'main.Version=$(VERSION)'" -tags "$(GOTAGS)" -o $(CURDIR)/dde $(CURDIR)
+	go build -ldflags="-s -X 'main.Version=$(VERSION)'" -tags "$(GOTAGS)" -o dde .
 
 run:
-	go run -tags "$(GOTAGS)" $(CURDIR)
+	go run -tags "$(GOTAGS)" .
 
 debug:
 	dlv debug --build-flags "-tags '$(GOTAGS)'" $(MAINPKG)
 
 watch:
-	air -c .air.conf
+	air -c .air.toml
 
 test:
-	go test -tags "$(GOTAGS)" -v $(CURDIR)/...
+	go test -tags "$(GOTAGS)" -v ./...
 
 bootstrap:
 	for subdir in $(SUBDIRS); do \
@@ -35,15 +35,15 @@ bootstrap:
 	done
 
 lint:
-	golint $(CURDIR)/...
+	golint ./...
 
 format:
-	for file in $$(find $(CURDIR) -type f -name "*.go"); do \
+	for file in $$(find . -type f -name "*.go"); do \
 		gofmt -s -w $$file; \
 	done
 
 clean: clean-test clean-watch
-	$(RM) $(CURDIR)/dde
+	$(RM) dde
 
 clean-test:
 	go clean -testcache
