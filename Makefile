@@ -42,7 +42,7 @@ format:
 		gofmt -s -w $$file; \
 	done
 
-clean: clean-test clean-watch
+clean: clean-test
 	$(RM) dde
 
 clean-test:
