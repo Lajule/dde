@@ -6,43 +6,6 @@ import (
 	"github.com/webview/webview"
 )
 
-/*
-html,
-body {
-  height: 100%;
-  margin: 0;
-  font-family: "Exo", sans-serif;
-  font-size: 16px;
-}
-.matrix {
-  display: flex;
-  flex-wrap: wrap;
-  height: calc(100% - 40px);
-}
-.matrix > div {
-  flex-grow: 1;
-  flex-basis: calc((100% / 2) - 40px);
-  padding: 20px;
-}
-#do {
-  background: lightgreen;
-}
-#schedule {
-  background: lightblue;
-}
-#delegate {
-  background: orange;
-}
-#cancel {
-  background: red;
-}
-.bar {
-  display: flex;
-  flex-direction: row-reverse;
-  height: 40px;
-}
-*/
-
 // Version Program version
 var Version = "development"
 
@@ -51,41 +14,80 @@ func main() {
 	defer w.Destroy()
 
 	w.SetTitle(fmt.Sprintf("dde %s", Version))
-	w.SetSize(800, 600, webview.HintNone)
+	w.SetSize(800, 600, webview.HintMin)
 
 	w.Bind("save", func() {
 	})
 
-	w.Bind("quit", func() {
+	w.Bind("terminate", func() {
 		w.Terminate()
 	})
 
-	w.Eval(`
+	w.Init(`
     window.addEventListener('DOMContentLoaded', event => {
+      var style = document.createElement('style')
+      style.innerHTML = '\
+* {\
+  margin: 0;\
+  padding: 0;\
+  box-sizing: border-box;\
+}\
+html,\
+body {\
+  height: 100%;\
+  font-family: "Exo", sans-serif;\
+  font-size: 12px;\
+}\
+.matrix {\
+  display: flex;\
+  flex-wrap: wrap;\
+  height: calc(100% - 40px);\
+}\
+.matrix > div {\
+  flex-grow: 1;\
+  flex-basis: calc(100% / 2);\
+  height: calc((100% / 2) - 40px);\
+  overflow-y: scroll;\
+}\
+.bar {\
+  display: flex;\
+  flex-direction: row-reverse;\
+  height: 40px;\
+}'
+      var head = document.getElementsByTagName('head')[0];
+      head.appendChild(style)
       var btns = document.querySelectorAll('.add')
       btns.forEach(btn => {
         btn.addEventListener('click', event => {
-          section = btn.parentNode
-          var task = section.getElementsByTagName('input')[0]
-          if (task.value != '') {
+          var section = btn.parentNode
+          var tasks = section.getElementsByClassName('tasks')[0]
+          var input = section.getElementsByTagName('input')[0]
+          if (input.value != '') {
             var div = document.createElement('div')
-            var input = document.createElement('input')
-            input.type = 'checkbox'
-            div.appendChild(input)
+            var box = document.createElement('input')
+            box.type = 'checkbox'
+            div.appendChild(box)
             var label = document.createElement('label')
-            label.innerHTML = task.value
+            label.innerHTML = input.value
             div.appendChild(label)
-            section.appendChild(div)
-            task.value = ''
+            tasks.appendChild(div)
+            input.value = ''
           }
         })
       })
-      clear = document.getElementById('clear')
+      var clear = document.getElementById('clear')
       clear.addEventListener('click', event => {
-        boxes = document.querySelectorAll('input[type=checkbox]')
+        var boxes = document.querySelectorAll('input[type=checkbox]')
+        boxes.forEach(box => {
+          if (box.checked) {
+            var node = box.parentNode
+            node.remove()
+          }
+        })
       })
-    })
-`)
+      var quit = document.getElementById('quit')
+      quit.addEventListener('click', event => { terminate() })
+    })`)
 
 	w.Navigate(`data:text/html,
 <!doctype html>
