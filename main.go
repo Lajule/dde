@@ -23,102 +23,93 @@ func main() {
 		w.Terminate()
 	})
 
-	w.Init(`
-    window.addEventListener('DOMContentLoaded', event => {
-      var style = document.createElement('style')
-      style.innerHTML = '\
-* {\
-  margin: 0;\
-  padding: 0;\
-  box-sizing: border-box;\
-}\
-html,\
-body {\
-  height: 100%;\
-  font-family: "Exo", sans-serif;\
-  font-size: 12px;\
-}\
-.matrix {\
-  display: flex;\
-  flex-wrap: wrap;\
-  height: calc(100% - 40px);\
-}\
-.matrix > div {\
-  flex-grow: 1;\
-  flex-basis: calc(100% / 2);\
-  height: calc((100% / 2) - 40px);\
-  overflow-y: scroll;\
-}\
-.bar {\
-  display: flex;\
-  flex-direction: row-reverse;\
-  height: 40px;\
-}'
-      var head = document.getElementsByTagName('head')[0];
-      head.appendChild(style)
-      var btns = document.querySelectorAll('.add')
-      btns.forEach(btn => {
+	w.Init(`window.addEventListener("DOMContentLoaded",e=>{var t=document.createElement("style");t.innerHTML='html,body{height:100%;margin:0;font-family:"Exo",sans-serif;font-size:12px;}button{border:0;background:none;}.matrix{display:flex;flex-wrap:wrap;height:calc(100% - 40px);}.matrix > div{flex-grow:1;flex-basis:calc((100% / 2) - 40px);padding:10px;}#do{background:lightgreen;}#schedule{background:lightblue;}#delegate{background:orange;}#cancel{background:red;}.matrix > div > input{width:85%;border:0;}.matrix > div > .tasks{position:absolute;width:calc((100% / 2) - 20px);height:calc((100% / 2) - 150px);overflow-y:scroll;}.bar{display:flex;flex-direction:row-reverse;height: 40px;}',document.getElementsByTagName("head")[0].appendChild(t),document.querySelectorAll(".add").forEach(e=>{e.addEventListener("click",t=>{var a=e.parentNode,n=a.getElementsByClassName("tasks")[0],d=a.getElementsByTagName("input")[0];if(""!=d.value){var l=document.createElement("div"),r=document.createElement("input");r.type="checkbox",l.appendChild(r);var i=document.createElement("label");i.innerHTML=d.value,l.appendChild(i),n.appendChild(l),d.value=""}})}),document.getElementById("clear").addEventListener("click",e=>{document.querySelectorAll("input[type=checkbox]").forEach(e=>{e.checked&&e.parentNode.remove()})}),document.getElementById("quit").addEventListener("click",e=>{terminate()})});`)
+
+/*
+window.addEventListener('DOMContentLoaded', event => {
+    var style = document.createElement('style')
+    style.innerHTML = '\
+html,body{height:100%;margin:0;font-family:"Exo",sans-serif;font-size:12px;}\
+button{border:0;background:none;}\
+.matrix{display:flex;flex-wrap:wrap;height:calc(100% - 40px);}\
+.matrix > div{flex-grow:1;flex-basis:calc((100% / 2) - 40px);padding:10px;}\
+#do{background:lightgreen;}\
+#schedule{background:lightblue;}\
+#delegate{background:orange;}\
+#cancel{background:red;}\
+.matrix > div > input{width:85%;border:0;}\
+.matrix > div > .tasks{position:absolute;width:calc((100% / 2) - 20px);height:calc((100% / 2) - 150px);overflow-y:scroll;}\
+.bar{display:flex;flex-direction:row-reverse;height: 40px;}'
+    var head = document.getElementsByTagName('head')[0];
+    head.appendChild(style)
+    var btns = document.querySelectorAll('.add')
+    btns.forEach(btn => {
         btn.addEventListener('click', event => {
-          var section = btn.parentNode
-          var tasks = section.getElementsByClassName('tasks')[0]
-          var input = section.getElementsByTagName('input')[0]
-          if (input.value != '') {
-            var div = document.createElement('div')
-            var box = document.createElement('input')
-            box.type = 'checkbox'
-            div.appendChild(box)
-            var label = document.createElement('label')
-            label.innerHTML = input.value
-            div.appendChild(label)
-            tasks.appendChild(div)
-            input.value = ''
-          }
+            var section = btn.parentNode
+            var tasks = section.getElementsByClassName('tasks')[0]
+            var input = section.getElementsByTagName('input')[0]
+            if (input.value != '') {
+                var div = document.createElement('div')
+                var box = document.createElement('input')
+                box.type = 'checkbox'
+                div.appendChild(box)
+                var label = document.createElement('label')
+                label.innerHTML = input.value
+                div.appendChild(label)
+                tasks.appendChild(div)
+                input.value = ''
+            }
         })
-      })
-      var clear = document.getElementById('clear')
-      clear.addEventListener('click', event => {
+    })
+    var clear = document.getElementById('clear')
+    clear.addEventListener('click', event => {
         var boxes = document.querySelectorAll('input[type=checkbox]')
         boxes.forEach(box => {
-          if (box.checked) {
-            var node = box.parentNode
-            node.remove()
-          }
+            if (box.checked) {
+                var node = box.parentNode
+                node.remove()
+            }
         })
-      })
-      var quit = document.getElementById('quit')
-      quit.addEventListener('click', event => { terminate() })
-    })`)
+    })
+    var quit = document.getElementById('quit')
+    quit.addEventListener('click', event => {
+        terminate()
+    })
+})
+*/
 
-	w.Navigate(`data:text/html,
+	w.Navigate(`data:text/html,<!doctype html><html> <div class=matrix> <div id=do> <h1>Do</h1> <h5>Important/Urgent</h5> <input type=text> <button class=add>Add</button> <div class=tasks></div> </div> <div id=schedule> <h1>Schedule</h1> <h5>Important/Not Urgent</h5> <input type=text> <button class=add>Add</button> <div class=tasks></div> </div> <div id=delegate> <h1>Delegate</h1> <h5>Not Important/Urgent</h5> <input type=text> <button class=add>Add</button> <div class=tasks></div> </div> <div id=cancel> <h1>Cancel</h1> <h5>Not Important/Not Urgent</h5> <input type=text> <button class=add>Add</button> <div class=tasks></div> </div> </div> <div class=bar> <button id=quit>Quit</button> <button id=save>Save</button> <button id=clear>Clear</button> </div></html>`)
+
+/*
 <!doctype html>
 <html>
   <div class=matrix>
     <div id=do>
       <h1>Do</h1>
       <h5>Important/Urgent</h5>
-      <button class=add>Add</button>
       <input type=text>
+      <button class=add>Add</button>
       <div class=tasks></div>
     </div>
     <div id=schedule>
       <h1>Schedule</h1>
       <h5>Important/Not Urgent</h5>
-      <button class=add>Add</button>
       <input type=text>
+      <button class=add>Add</button>
       <div class=tasks></div>
     </div>
     <div id=delegate>
       <h1>Delegate</h1>
       <h5>Not Important/Urgent</h5>
-      <button class=add>Add</button>
       <input type=text>
+      <button class=add>Add</button>
       <div class=tasks></div>
     </div>
     <div id=cancel>
       <h1>Cancel</h1>
       <h5>Not Important/Not Urgent</h5>
-      <button class=add>Add</button>
       <input type=text>
+      <button class=add>Add</button>
       <div class=tasks></div>
     </div>
   </div>
@@ -127,7 +118,8 @@ body {\
     <button id=save>Save</button>
     <button id=clear>Clear</button>
   </div>
-</html>`)
+</html>
+*/
 
 	w.Run()
 }
