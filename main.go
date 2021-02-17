@@ -22,7 +22,6 @@ func main() {
 	defer w.Destroy()
 
 	w.SetTitle(fmt.Sprintf("DDE %s", Version))
-
 	w.SetSize(800, 600, webview.HintNone)
 
 	w.Bind("load", func() Tasks {
@@ -37,6 +36,5 @@ func main() {
 	w.Init(string(Application))
 
 	w.Navigate(`data:text/html,<!doctype html><html></html>`)
-
 	w.Run()
 }
