@@ -16,13 +16,17 @@ func main() {
 	defer w.Destroy()
 
 	w.SetTitle(fmt.Sprintf("dde %s", Version))
-	w.SetSize(800, 600, webview.HintMin)
 
-	w.Bind("update", func(data map[string]interface{}) {
-		fmt.Printf("%#v\n", data)
+	configuration := Load("dde.json")
+
+	w.SetSize(configuration.Window.W, configuration.Window.H, webview.HintNone)
+
+	w.Bind("load", func() Configuration {
+		return configuration
 	})
 
-	w.Bind("terminate", func() {
+	w.Bind("terminate", func(newConfiguration Configuration) {
+		newConfiguration.Dump("dde.json")
 		w.Terminate()
 	})
 

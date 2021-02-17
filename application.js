@@ -40,7 +40,6 @@ window.addEventListener('DOMContentLoaded', event => {
 </div>
 <div class=bar>
   <button id=quit>Quit</button>
-  <button id=save>Save</button>
   <button id=clear>Clear</button>
 </div>`
 
@@ -133,14 +132,14 @@ button {
         })
     })
 
-    document.getElementById('save').addEventListener('click', event => {
-	var getById = section => Array.from(document.querySelectorAll('#' + section +' > .tasks > div')).map(task => {
+    document.getElementById('quit').addEventListener('click', event => {
+	var getById = id => Array.from(document.querySelectorAll('#' + id +' > .tasks > div')).map(task => {
 	    return {
 		checked: task.getElementsByTagName("input")[0].checked,
 		label: task.getElementsByTagName("label")[0].innerHTML
 	    }
 	})
-        update({
+        terminate({
             window: {
                 w: window.innerWidth,
                 h: window.innerHeight
@@ -154,7 +153,28 @@ button {
         })
     })
 
-    document.getElementById('quit').addEventListener('click', event => {
-        terminate()
+    load().then(configuration => {
+	var setById = id => {
+	    var tasks = document.querySelector('#' + id + ' > .tasks')
+	    if (configuration.tasks[id]) {
+		configuration.tasks[id].forEach(task => {
+		    var div = document.createElement('div')
+		    var box = document.createElement('input')
+		    box.type = 'checkbox'
+		    box.checked = task.checked
+		    div.appendChild(box)
+		    var label = document.createElement('label')
+		    label.innerHTML = task.label
+		    div.appendChild(label)
+		    tasks.appendChild(div)
+		})
+	    }
+	}
+	if (configuration.tasks) {
+	    setById('do')
+	    setById('schedule')
+	    setById('delegate')
+	    setById('cancel')
+	}
     })
 })
