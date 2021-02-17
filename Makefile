@@ -2,21 +2,24 @@ NAME := dde
 MAINPKG := github.com/Lajule/dde
 VERSION := 0.0.0
 
-TARGETS := all run debug watch test bootstrap lint format clean clean-test
+TARGETS := all run debug watch generate test bootstrap lint format clean clean-test
 
-all:
+all: generate
 	go build -ldflags="-s -X 'main.Version=$(VERSION)'" -tags "$(GOTAGS)" -o dde .
 
-run:
+run: generate
 	go run -tags "$(GOTAGS)" .
 
-debug:
+debug: generate
 	dlv debug --build-flags "-tags '$(GOTAGS)'" $(MAINPKG)
 
 watch:
 	air -c .air.toml
 
-test:
+generate:
+	go generate
+
+test: generate
 	go test -tags "$(GOTAGS)" -v ./...
 
 bootstrap:
