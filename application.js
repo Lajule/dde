@@ -140,24 +140,18 @@ button {
 	    }
 	})
         terminate({
-            window: {
-                w: window.innerWidth,
-                h: window.innerHeight
-            },
-            tasks: {
-                do: getById('do'),
-                schedule: getById('schedule'),
-                delegate: getById('delegate'),
-                cancel: getById('cancel'),
-            }
+            do: getById('do'),
+            schedule: getById('schedule'),
+            delegate: getById('delegate'),
+            cancel: getById('cancel'),
         })
     })
 
-    load().then(configuration => {
+    load().then(result => {
 	var setById = id => {
 	    var tasks = document.querySelector('#' + id + ' > .tasks')
-	    if (configuration.tasks[id]) {
-		configuration.tasks[id].forEach(task => {
+	    if (result[id]) {
+		result[id].forEach(task => {
 		    var div = document.createElement('div')
 		    var box = document.createElement('input')
 		    box.type = 'checkbox'
@@ -170,11 +164,9 @@ button {
 		})
 	    }
 	}
-	if (configuration.tasks) {
-	    setById('do')
-	    setById('schedule')
-	    setById('delegate')
-	    setById('cancel')
-	}
+	setById('do')
+	setById('schedule')
+	setById('delegate')
+	setById('cancel')
     })
 })

@@ -1,6 +1,6 @@
 NAME := dde
 MAINPKG := github.com/Lajule/dde
-VERSION := 0.0.0
+VERSION := 0.0.1
 
 TARGETS := all run debug watch generate test bootstrap lint format clean clean-test
 

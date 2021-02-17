@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 
 	"github.com/webview/webview"
@@ -11,22 +12,25 @@ import (
 // Version Program version
 var Version = "development"
 
+var debug = flag.Bool("d", false, "Debug mode")
+var config = flag.String("c", ".dde.json", "Config filename")
+
 func main() {
-	w := webview.New(true)
+	flag.Parse()
+
+	w := webview.New(*debug)
 	defer w.Destroy()
 
-	w.SetTitle(fmt.Sprintf("dde %s", Version))
+	w.SetTitle(fmt.Sprintf("DDE %s", Version))
 
-	configuration := Load("dde.json")
+	w.SetSize(800, 600, webview.HintNone)
 
-	w.SetSize(configuration.Window.W, configuration.Window.H, webview.HintNone)
-
-	w.Bind("load", func() Configuration {
-		return configuration
+	w.Bind("load", func() Tasks {
+		return Load(*config)
 	})
 
-	w.Bind("terminate", func(newConfiguration Configuration) {
-		newConfiguration.Dump("dde.json")
+	w.Bind("terminate", func(tasks Tasks) {
+		tasks.Dump(*config)
 		w.Terminate()
 	})
 

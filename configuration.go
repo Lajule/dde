@@ -5,12 +5,6 @@ import (
 	"io/ioutil"
 )
 
-// Window Window size
-type Window struct {
-	W int
-	H int
-}
-
 // Tasks All tasks
 type Tasks struct {
 	Do       []*Task `json:"do"`
@@ -25,15 +19,9 @@ type Task struct {
 	Label   string `json:"label"`
 }
 
-// Configuration program configuration
-type Configuration struct {
-	Window *Window `json:"window"`
-	Tasks  *Tasks  `json:"tasks"`
-}
-
-// Dump Dump configuration
-func (c Configuration) Dump(f string) {
-	data, err := json.Marshal(c)
+// Dump Dump tasks
+func (t Tasks) Dump(f string) {
+	data, err := json.Marshal(t)
 	if err != nil {
 		return
 	}
@@ -41,15 +29,15 @@ func (c Configuration) Dump(f string) {
 	ioutil.WriteFile(f, data, 0644)
 }
 
-// Load Load configuration file
-func Load(f string) Configuration {
-	configuration := Configuration{}
+// Load Load tasks file
+func Load(f string) Tasks {
+	t := Tasks{}
 
 	data, err := ioutil.ReadFile(f)
 	if err != nil {
-		return configuration
+		return t
 	}
 
-	_ = json.Unmarshal(data, &configuration)
-	return configuration
+	_ = json.Unmarshal(data, &t)
+	return t
 }
