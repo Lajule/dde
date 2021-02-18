@@ -20,5 +20,6 @@ Usage of ./dde:
 ## Build
 
 ```sh
-make
+go generate
+go build
 ```
