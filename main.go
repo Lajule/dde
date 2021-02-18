@@ -28,8 +28,11 @@ func main() {
 		return Load(*config)
 	})
 
-	w.Bind("terminate", func(tasks Tasks) {
+	w.Bind("update", func(tasks Tasks) {
 		tasks.Dump(*config)
+	})
+
+	w.Bind("terminate", func() {
 		w.Terminate()
 	})
 

@@ -1,4 +1,5 @@
 window.addEventListener('DOMContentLoaded', event => {
+    // Add DOM elements first
     document.getElementsByTagName('body')[0].innerHTML = `
 <div class=matrix>
   <div id=do>
@@ -43,7 +44,8 @@ window.addEventListener('DOMContentLoaded', event => {
   <button id=clear>Clear</button>
 </div>`
 
-    var style = document.createElement('style')
+    // Then inject stylesheet
+    const style = document.createElement('style')
     style.innerHTML = `
 html,
 body {
@@ -95,78 +97,123 @@ button {
 }`
     document.getElementsByTagName('head')[0].appendChild(style)
 
+    const sections = ['do', 'schedule', 'delegate', 'cancel']
+
+    const loadTasks = (configuration) => {
+	const setById = id => {
+	    const tasks = document.querySelector('#' + id + ' > .tasks')
+	    if (configuration[id]) {
+		configuration[id].forEach(task => {
+		    tasks.appendChild(newTask(task.checked, task.label))
+		})
+	    }
+	}
+
+	sections.forEach(id => {
+	    setById(id)
+	})
+    }
+
+    const updateTasks = () => {
+	const getById = id => Array.from(document.querySelectorAll('#' + id +' > .tasks > div')).map(task => {
+	    return {
+		checked: task.getElementsByTagName("input")[0].checked,
+		label: task.getElementsByTagName("label")[0].innerHTML
+	    }
+	})
+
+	update(sections.reduce((result, id) => {
+	    result[id] = getById(id)
+	    return result
+	}, {}))
+    }
+
+    const newTask = (checked, text) => {
+        const div = document.createElement('div')
+	// Generate unique identifier
+	div.id = '_' + Math.random().toString(36).substr(2, 9)
+	// Allow drag and drop
+	div.draggable = true
+	div.addEventListener('dragstart', event => {
+	    event.dataTransfer.setData('text/plain', event.target.id)
+	})
+
+        const box = document.createElement('input')
+        box.type = 'checkbox'
+	box.checked = checked
+        div.appendChild(box)
+
+        const label = document.createElement('label')
+        label.innerHTML = text
+	div.appendChild(label)
+
+	return div
+    }
+
+    // Handle "Add" buttons click
     document.querySelectorAll('.add').forEach(btn => {
-        var tasks = btn.parentNode.parentNode.getElementsByClassName('tasks')[0]
-        var input = btn.parentNode.parentNode.getElementsByTagName('input')[0]
-        var add = () => {
-            var div = document.createElement('div')
-            var box = document.createElement('input')
-            box.type = 'checkbox'
-            div.appendChild(box)
-            var label = document.createElement('label')
-            label.innerHTML = input.value
-            div.appendChild(label)
-            tasks.appendChild(div)
+        const tasks = btn.parentNode.parentNode.getElementsByClassName('tasks')[0]
+        const input = btn.parentNode.getElementsByTagName('input')[0]
+        const addTask = () => {
+	    tasks.appendChild(newTask(false, input.value))
+	    // Move to the end list and reset input
             tasks.scrollTop = tasks.scrollHeight
             input.value = ''
         }
 
         input.addEventListener('keydown', event => {
+	    // Add a task if 'enter' key is pressed
             if (event.keyCode == 13 && event.target.value != '') {
-                add()
+                addTask()
             }
         })
 
         btn.addEventListener('click', event => {
             if (input.value != '') {
-                add()
+                addTask()
             }
         })
     })
 
+    // Remove completed tasks from the DOM
     document.getElementById('clear').addEventListener('click', event => {
         document.querySelectorAll('input[type=checkbox]').forEach(box => {
             if (box.checked) {
                 box.parentNode.remove()
             }
         })
+
+	updateTasks()
     })
 
+    // Kill the app
     document.getElementById('quit').addEventListener('click', event => {
-	var getById = id => Array.from(document.querySelectorAll('#' + id +' > .tasks > div')).map(task => {
-	    return {
-		checked: task.getElementsByTagName("input")[0].checked,
-		label: task.getElementsByTagName("label")[0].innerHTML
+        terminate()
+    })
+
+    // Handle drop, consider ".task" as dropzone
+    document.querySelectorAll('.tasks').forEach(tasks => {
+	tasks.addEventListener('dragover', event => {
+	    event.preventDefault()
+	})
+
+	tasks.addEventListener('drop', event => {
+	    event.preventDefault()
+	    // Drop element only if target is a dropzone
+	    if (event.target.classList.contains('tasks')) {
+		const id = event.dataTransfer.getData('text/plain')
+		event.target.appendChild(document.getElementById(id))
 	    }
 	})
-        terminate({
-            do: getById('do'),
-            schedule: getById('schedule'),
-            delegate: getById('delegate'),
-            cancel: getById('cancel'),
-        })
     })
 
+    // Persist changes
+    document.addEventListener('change', event => {
+	updateTasks()
+    })
+
+    // Load tasks from config
     load().then(result => {
-	var setById = id => {
-	    var tasks = document.querySelector('#' + id + ' > .tasks')
-	    if (result[id]) {
-		result[id].forEach(task => {
-		    var div = document.createElement('div')
-		    var box = document.createElement('input')
-		    box.type = 'checkbox'
-		    box.checked = task.checked
-		    div.appendChild(box)
-		    var label = document.createElement('label')
-		    label.innerHTML = task.label
-		    div.appendChild(label)
-		    tasks.appendChild(div)
-		})
-	    }
-	}
-	setById('do')
-	setById('schedule')
-	setById('delegate')
-	setById('cancel')
+	loadTasks(result)
     })
 })
