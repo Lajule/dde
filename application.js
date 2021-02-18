@@ -99,21 +99,7 @@ button {
 
     const sections = ['do', 'schedule', 'delegate', 'cancel']
 
-    const loadTasks = (configuration) => {
-	const setById = id => {
-	    const tasks = document.querySelector('#' + id + ' > .tasks')
-	    if (configuration[id]) {
-		configuration[id].forEach(task => {
-		    tasks.appendChild(newTask(task.checked, task.label))
-		})
-	    }
-	}
-
-	sections.forEach(id => {
-	    setById(id)
-	})
-    }
-
+    // Persist changes into file
     const updateTasks = () => {
 	const getById = id => Array.from(document.querySelectorAll('#' + id +' > .tasks > div')).map(task => {
 	    return {
@@ -121,7 +107,6 @@ button {
 		label: task.getElementsByTagName("label")[0].innerHTML
 	    }
 	})
-
 	update(sections.reduce((result, id) => {
 	    result[id] = getById(id)
 	    return result
@@ -137,16 +122,16 @@ button {
 	div.addEventListener('dragstart', event => {
 	    event.dataTransfer.setData('text/plain', event.target.id)
 	})
-
         const box = document.createElement('input')
         box.type = 'checkbox'
 	box.checked = checked
+	box.addEventListener('change', event => {
+	    updateTasks()
+	})
         div.appendChild(box)
-
         const label = document.createElement('label')
         label.innerHTML = text
 	div.appendChild(label)
-
 	return div
     }
 
@@ -159,15 +144,14 @@ button {
 	    // Move to the end list and reset input
             tasks.scrollTop = tasks.scrollHeight
             input.value = ''
+	    updateTasks()
         }
-
         input.addEventListener('keydown', event => {
 	    // Add a task if 'enter' key is pressed
             if (event.keyCode == 13 && event.target.value != '') {
                 addTask()
             }
         })
-
         btn.addEventListener('click', event => {
             if (input.value != '') {
                 addTask()
@@ -182,7 +166,6 @@ button {
                 box.parentNode.remove()
             }
         })
-
 	updateTasks()
     })
 
@@ -196,24 +179,29 @@ button {
 	tasks.addEventListener('dragover', event => {
 	    event.preventDefault()
 	})
-
 	tasks.addEventListener('drop', event => {
 	    event.preventDefault()
 	    // Drop element only if target is a dropzone
 	    if (event.target.classList.contains('tasks')) {
 		const id = event.dataTransfer.getData('text/plain')
 		event.target.appendChild(document.getElementById(id))
+		updateTasks()
 	    }
 	})
     })
 
-    // Persist changes
-    document.addEventListener('change', event => {
-	updateTasks()
-    })
-
-    // Load tasks from config
+    // Load tasks from file
     load().then(result => {
-	loadTasks(result)
+	const setById = id => {
+	    const tasks = document.querySelector('#' + id + ' > .tasks')
+	    if (result[id]) {
+		result[id].forEach(task => {
+		    tasks.appendChild(newTask(task.checked, task.label))
+		})
+	    }
+	}
+	sections.forEach(id => {
+	    setById(id)
+	})
     })
 })

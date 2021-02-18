@@ -13,7 +13,7 @@ import (
 var Version = "development"
 
 var debug = flag.Bool("d", false, "Debug mode")
-var config = flag.String("c", ".dde.json", "Config filename")
+var file = flag.String("f", ".dde.json", "Tasks filename")
 
 func main() {
 	flag.Parse()
@@ -25,11 +25,11 @@ func main() {
 	w.SetSize(800, 600, webview.HintNone)
 
 	w.Bind("load", func() Tasks {
-		return Load(*config)
+		return Load(*file)
 	})
 
 	w.Bind("update", func(tasks Tasks) {
-		tasks.Dump(*config)
+		tasks.Dump(*file)
 	})
 
 	w.Bind("terminate", func() {

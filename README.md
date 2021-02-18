@@ -11,10 +11,9 @@ A Dwight D. Eisenhower matrix application written using [webview][1].
 ```sh
 ./dde -h
 Usage of ./dde:
-  -c string
-    	Config filename (default ".dde.json")
   -d	Debug mode
-
+  -f string
+    	Tasks filename (default ".dde.json")
 ```
 
 ## Build
