@@ -64,8 +64,9 @@ button {
   height: calc(100% - 40px);
 }
 .matrix > div {
-  flex-grow: 1;
-  flex-basis: calc((100% / 2) - 40px);
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 calc((100% / 2) - 40px);
   padding: 10px;
 }
 #do {
@@ -81,14 +82,14 @@ button {
   background: red;
 }
 .matrix > div > .bar > input {
-  flex-grow: 1;
+  flex: 1 1 auto;
   border: 0;
 }
 .matrix > div > .tasks {
-  position: absolute;
-  width: calc((100% / 2) - 20px);
-  height: calc((100% / 2) - 180px);
-  overflow-y: scroll;
+  flex: 1 1 auto;
+  padding: 1px;
+  height: 100px;
+  overflow-y: auto;
 }
 .bar {
   display: flex;
@@ -96,8 +97,6 @@ button {
   height: 40px;
 }`
     document.getElementsByTagName('head')[0].appendChild(style)
-
-    const sections = ['do', 'schedule', 'delegate', 'cancel']
 
     // Persist changes into file
     const updateTasks = () => {
@@ -107,15 +106,16 @@ button {
 		label: task.getElementsByTagName("label")[0].innerHTML
 	    }
 	})
-	update(sections.reduce((result, id) => {
-	    result[id] = getById(id)
-	    return result
-	}, {}))
+	update({
+	    do: getById('do'),
+	    schedule: getById('schedule'),
+	    delegate: getById('delegate'),
+	    cancel: getById('cancel')
+	})
     }
 
     const newTask = (checked, text) => {
         const div = document.createElement('div')
-	// Generate unique identifier
 	div.id = '_' + Math.random().toString(36).substr(2, 9)
 	// Allow drag and drop
 	div.draggable = true
@@ -123,6 +123,7 @@ button {
 	    event.dataTransfer.setData('text/plain', event.target.id)
 	})
         const box = document.createElement('input')
+	box.id = '_' + Math.random().toString(36).substr(2, 9)
         box.type = 'checkbox'
 	box.checked = checked
 	box.addEventListener('change', event => {
@@ -130,6 +131,7 @@ button {
 	})
         div.appendChild(box)
         const label = document.createElement('label')
+	label.htmlFor = box.id
         label.innerHTML = text
 	div.appendChild(label)
 	return div
@@ -174,19 +176,16 @@ button {
         terminate()
     })
 
-    // Handle drop, consider ".task" as dropzone
+    // Handle drop
     document.querySelectorAll('.tasks').forEach(tasks => {
-	tasks.addEventListener('dragover', event => {
+	tasks.parentNode.addEventListener('dragover', event => {
 	    event.preventDefault()
 	})
-	tasks.addEventListener('drop', event => {
+	tasks.parentNode.addEventListener('drop', event => {
 	    event.preventDefault()
-	    // Drop element only if target is a dropzone
-	    if (event.target.classList.contains('tasks')) {
-		const id = event.dataTransfer.getData('text/plain')
-		event.target.appendChild(document.getElementById(id))
-		updateTasks()
-	    }
+	    const id = event.dataTransfer.getData('text/plain')
+	    tasks.appendChild(document.getElementById(id))
+	    updateTasks()
 	})
     })
 
@@ -200,8 +199,9 @@ button {
 		})
 	    }
 	}
-	sections.forEach(id => {
-	    setById(id)
-	})
+	setById('do')
+	setById('schedule')
+	setById('delegate')
+	setById('cancel')
     })
 })
