@@ -117,7 +117,7 @@ button {
     const newTask = (checked, text) => {
         const div = document.createElement('div')
 	div.id = '_' + Math.random().toString(36).substr(2, 9)
-	// Allow drag and drop
+	// Allow drag
 	div.draggable = true
 	div.addEventListener('dragstart', event => {
 	    event.dataTransfer.setData('text/plain', event.target.id)
@@ -137,10 +137,10 @@ button {
 	return div
     }
 
-    // Handle "Add" buttons click
-    document.querySelectorAll('.add').forEach(btn => {
-        const tasks = btn.parentNode.parentNode.getElementsByClassName('tasks')[0]
-        const input = btn.parentNode.getElementsByTagName('input')[0]
+    document.querySelectorAll('.tasks').forEach(tasks => {
+	const button = tasks.parentNode.getElementsByTagName('button')[0]
+        const input = tasks.parentNode.getElementsByTagName('input')[0]
+	// Handle "Add" action
         const addTask = () => {
 	    tasks.appendChild(newTask(false, input.value))
 	    // Move to the end list and reset input
@@ -154,11 +154,21 @@ button {
                 addTask()
             }
         })
-        btn.addEventListener('click', event => {
+        button.addEventListener('click', event => {
             if (input.value != '') {
                 addTask()
             }
         })
+	// Handle drop
+	tasks.parentNode.addEventListener('dragover', event => {
+	    event.preventDefault()
+	})
+	tasks.parentNode.addEventListener('drop', event => {
+	    event.preventDefault()
+	    const id = event.dataTransfer.getData('text/plain')
+	    tasks.appendChild(document.getElementById(id))
+	    updateTasks()
+	})
     })
 
     // Remove completed tasks from the DOM
@@ -174,19 +184,6 @@ button {
     // Kill the app
     document.getElementById('quit').addEventListener('click', event => {
         terminate()
-    })
-
-    // Handle drop
-    document.querySelectorAll('.tasks').forEach(tasks => {
-	tasks.parentNode.addEventListener('dragover', event => {
-	    event.preventDefault()
-	})
-	tasks.parentNode.addEventListener('drop', event => {
-	    event.preventDefault()
-	    const id = event.dataTransfer.getData('text/plain')
-	    tasks.appendChild(document.getElementById(id))
-	    updateTasks()
-	})
     })
 
     // Load tasks from file
