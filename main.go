@@ -13,7 +13,7 @@ import (
 var Version = "development"
 
 var debug = flag.Bool("d", false, "Debug mode")
-var file = flag.String("f", ".dde.json", "Tasks filename")
+var file = flag.String("f", "tasks.json", "Tasks filename")
 
 func main() {
 	flag.Parse()
