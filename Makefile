@@ -5,7 +5,7 @@ VERSION := 0.0.1
 TARGETS := all run debug watch generate test bootstrap lint format clean clean-test
 
 all: generate
-	go build -ldflags="-s -X 'main.Version=$(VERSION)'" -tags "$(GOTAGS)" -o dde .
+	go build -ldflags="-s -X 'main.Version=$(VERSION)'" -tags "$(GOTAGS)" -o $(NAME) .
 
 run: generate
 	go run -tags "$(GOTAGS)" .
@@ -46,7 +46,7 @@ format:
 	done
 
 clean: clean-test
-	$(RM) dde
+	$(RM) $(NAME)
 
 clean-test:
 	go clean -testcache
