@@ -1,52 +1,7 @@
 window.addEventListener('DOMContentLoaded', function(event) {
 	// Add DOM elements first
 	document.body.innerHTML = `
-<div class=matrix>
-  <div id=do>
-    <h1>Do</h1>
-    <h5>Important/Urgent</h5>
-    <div class=bar>
-      <button class=add>Add</button>
-      <input type=text>
-    </div>
-    <div class=tasks></div>
-  </div>
-  <div id=schedule>
-    <h1>Schedule</h1>
-    <h5>Important/Not Urgent</h5>
-    <div class=bar>
-      <button class=add>Add</button>
-      <input type=text>
-    </div>
-    <div class=tasks></div>
-  </div>
-  <div id=delegate>
-    <h1>Delegate</h1>
-    <h5>Not Important/Urgent</h5>
-    <div class=bar>
-      <button class=add>Add</button>
-      <input type=text>
-    </div>
-    <div class=tasks></div>
-  </div>
-  <div id=cancel>
-    <h1>Cancel</h1>
-    <h5>Not Important/Not Urgent</h5>
-    <div class=bar>
-      <button class=add>Add</button>
-      <input type=text>
-    </div>
-    <div class=tasks></div>
-  </div>
-</div>
-<div class=bar>
-  <button id=quit>Quit</button>
-  <button id=clear>Clear</button>
-</div>`
-
-	// Then inject stylesheet
-	const style = document.createElement('style')
-	style.innerHTML = `
+<style>
 html,
 body {
   height: 100%;
@@ -95,8 +50,50 @@ button {
   display: flex;
   flex-direction: row-reverse;
   height: 40px;
-}`
-	document.head.appendChild(style)
+}
+</style>
+<div class=matrix>
+  <div id=do>
+    <h1>Do</h1>
+    <h5>Important/Urgent</h5>
+    <div class=bar>
+      <button class=add>Add</button>
+      <input type=text>
+    </div>
+    <div class=tasks></div>
+  </div>
+  <div id=schedule>
+    <h1>Schedule</h1>
+    <h5>Important/Not Urgent</h5>
+    <div class=bar>
+      <button class=add>Add</button>
+      <input type=text>
+    </div>
+    <div class=tasks></div>
+  </div>
+  <div id=delegate>
+    <h1>Delegate</h1>
+    <h5>Not Important/Urgent</h5>
+    <div class=bar>
+      <button class=add>Add</button>
+      <input type=text>
+    </div>
+    <div class=tasks></div>
+  </div>
+  <div id=cancel>
+    <h1>Cancel</h1>
+    <h5>Not Important/Not Urgent</h5>
+    <div class=bar>
+      <button class=add>Add</button>
+      <input type=text>
+    </div>
+    <div class=tasks></div>
+  </div>
+</div>
+<div class=bar>
+  <button id=quit>Quit</button>
+  <button id=clear>Clear</button>
+</div>`
 
 	// Load tasks from file
 	function loadTasks() {
