@@ -1,16 +1,18 @@
 package main
 
 import (
+	_ "embed"
 	"flag"
 	"fmt"
 
 	"github.com/webview/webview"
 )
 
-//go:generate go run generator.go
-
 // Version Program version
 var Version = "development"
+
+//go:embed application.js
+var Application string
 
 var debug = flag.Bool("d", false, "Debug mode")
 var file = flag.String("f", "tasks.json", "Tasks filename")

@@ -4,13 +4,13 @@ VERSION := 0.0.1
 
 TARGETS := all run debug watch generate test bootstrap lint format clean clean-test
 
-all: generate
+all:
 	go build -ldflags="-s -X 'main.Version=$(VERSION)'" -tags "$(GOTAGS)" -o $(NAME) .
 
-run: generate
+run:
 	go run -tags "$(GOTAGS)" .
 
-debug: generate
+debug:
 	dlv debug --build-flags "-tags '$(GOTAGS)'" $(MAINPKG)
 
 watch:
@@ -19,7 +19,7 @@ watch:
 generate:
 	go generate
 
-test: generate
+test:
 	go test -tags "$(GOTAGS)" -v ./...
 
 bootstrap:
