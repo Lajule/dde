@@ -2,6 +2,7 @@ NAME := dde
 MAINPKG := github.com/Lajule/dde
 VERSION := 0.0.1
 
+CP := cp
 TARGETS := all run debug watch generate test bootstrap lint format clean clean-test
 
 all:
@@ -25,15 +26,7 @@ test:
 bootstrap:
 	for subdir in $(SUBDIRS); do \
 		for dir in $$(find $$subdir -type d); do \
-			$(RM) $$dir/Makefile; \
-			{ \
-				echo "TARGETS := $(TARGETS)"; \
-				echo ""; \
-				echo '$$(TARGETS):'; \
-				echo '	$$(MAKE) -C .. $$@'; \
-				echo ""; \
-				echo '.PHONY = $$(TARGETS)'; \
-			} >$$dir/Makefile; \
+			$(CP) Makefile.in $$dir/Makefile; \
 		done \
 	done
 

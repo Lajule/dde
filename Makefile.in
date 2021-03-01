@@ -1,0 +1,6 @@
+TARGETS := all run debug watch generate test bootstrap lint format clean clean-test
+
+$(TARGETS):
+	$(MAKE) -C .. $@
+
+.PHONY = $(TARGETS)
