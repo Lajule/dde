@@ -19,6 +19,5 @@ Usage of ./dde:
 ## Build
 
 ```sh
-go generate
 go build
 ```
