@@ -5,6 +5,13 @@ import (
 	"io/ioutil"
 )
 
+// Config Application configuration
+type Config struct {
+	W     int    `json:"w"`
+	H     int    `json:"h"`
+	Tasks Tasks `json:"tasks"`
+}
+
 // Tasks All tasks
 type Tasks struct {
 	Do       []*Task `json:"do"`
@@ -19,9 +26,9 @@ type Task struct {
 	Label   string `json:"label"`
 }
 
-// Dump Dump tasks
-func (t Tasks) Dump(f string) {
-	data, err := json.Marshal(t)
+// Dump Dump configuration
+func (c Config) Dump(f string) {
+	data, err := json.Marshal(c)
 	if err != nil {
 		return
 	}
@@ -29,15 +36,17 @@ func (t Tasks) Dump(f string) {
 	ioutil.WriteFile(f, data, 0644)
 }
 
-// Load Load tasks file
-func Load(f string) Tasks {
-	t := Tasks{}
+// Load Load configuration file
+func Load(f string) Config {
+	c := Config{}
 
 	data, err := ioutil.ReadFile(f)
 	if err != nil {
-		return t
+		return c
 	}
 
-	_ = json.Unmarshal(data, &t)
-	return t
+	json.Unmarshal(data, &c)
+
+	return c
 }
+

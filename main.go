@@ -11,34 +11,36 @@ import (
 // Version Program version
 var Version = "development"
 
-//go:embed application.js
-var Application string
+//go:embed app.js
+var app string
 
 var debug = flag.Bool("d", false, "Debug mode")
-var file = flag.String("f", "tasks.json", "Tasks filename")
+var file = flag.String("c", "config.json", "Configuration filename")
 
 func main() {
 	flag.Parse()
+
+	c := Load(*file)
 
 	w := webview.New(*debug)
 	defer w.Destroy()
 
 	w.SetTitle(fmt.Sprintf("DDE %s", Version))
-	w.SetSize(800, 600, webview.HintNone)
+	w.SetSize(c.W, c.H, webview.HintNone)
 
 	w.Bind("load", func() Tasks {
-		return Load(*file)
+		return c.Tasks
 	})
 
-	w.Bind("update", func(tasks Tasks) {
-		tasks.Dump(*file)
+	w.Bind("update", func(config Config) {
+		config.Dump(*file)
 	})
 
 	w.Bind("terminate", func() {
 		w.Terminate()
 	})
 
-	w.Init(string(Application))
+	w.Init(app)
 
 	w.Navigate(`data:text/html,<!doctype html><html></html>`)
 	w.Run()

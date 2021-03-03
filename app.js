@@ -113,17 +113,21 @@ button {
 
     // Persist changes into file
     function updateTasks() {
-        update(Array.from(document.querySelectorAll('.tasks'))
-            .reduce((accumulator, current) => {
-                accumulator[current.parentNode.id] = Array.from(current.childNodes)
-                    .map(task => {
-                        return {
-                            checked: task.childNodes[0].checked,
-                            label: task.childNodes[1].innerHTML
-                        }
-                    })
-                return accumulator
-            }, {}))
+        update({
+	    w: window.innerWidth,
+	    h: window.innerHeight,
+	    tasks: Array.from(document.querySelectorAll('.tasks'))
+		.reduce((accumulator, current) => {
+                    accumulator[current.parentNode.id] = Array.from(current.childNodes)
+			.map(task => {
+                            return {
+				checked: task.childNodes[0].checked,
+				label: task.childNodes[1].innerHTML
+                            }
+			})
+                    return accumulator
+		}, {})
+	})
     }
 
     // Add new task to DOM
