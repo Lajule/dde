@@ -26,8 +26,23 @@ type Task struct {
 	Label   string `json:"label"`
 }
 
+// Size Get window size
+func (c Config) Size() (int, int) {
+	if c.W == 0 || c.H == 0 {
+		return 800, 600
+	}
+
+	return c.W, c.H
+}
+
 // Dump Dump configuration
-func (c Config) Dump(f string) {
+func Dump(f string, w, h int, tasks Tasks) {
+	c := Config{
+		W: w,
+		H: h,
+		Tasks: tasks,
+	}
+
 	data, err := json.Marshal(c)
 	if err != nil {
 		return
@@ -37,16 +52,22 @@ func (c Config) Dump(f string) {
 }
 
 // Load Load configuration file
-func Load(f string) Config {
+func Load(f string) (int, int, Tasks) {
 	c := Config{}
 
 	data, err := ioutil.ReadFile(f)
 	if err != nil {
-		return c
+		return 800, 600, Tasks{}
 	}
 
-	json.Unmarshal(data, &c)
+	err = json.Unmarshal(data, &c)
+	if err != nil {
+		return 800, 600, Tasks{}
+	}
 
-	return c
+	if c.W == 0 || c.H == 0 {
+		return 800, 600, c.Tasks
+	}
+
+	return c.W, c.H, c.Tasks
 }
-

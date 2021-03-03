@@ -113,21 +113,19 @@ button {
 
     // Persist changes into file
     function updateTasks() {
-        update({
-	    w: window.innerWidth,
-	    h: window.innerHeight,
-	    tasks: Array.from(document.querySelectorAll('.tasks'))
-		.reduce((accumulator, current) => {
-                    accumulator[current.parentNode.id] = Array.from(current.childNodes)
-			.map(task => {
-                            return {
-				checked: task.childNodes[0].checked,
-				label: task.childNodes[1].innerHTML
-                            }
-			})
-                    return accumulator
-		}, {})
-	})
+        update(window.innerWidth,
+	       window.innerHeight,
+	       Array.from(document.querySelectorAll('.tasks'))
+	       .reduce((accumulator, current) => {
+                   accumulator[current.parentNode.id] = Array.from(current.childNodes)
+		       .map(task => {
+                           return {
+			       checked: task.childNodes[0].checked,
+			       label: task.childNodes[1].innerHTML
+                           }
+		       })
+                   return accumulator
+	       }, {}))
     }
 
     // Add new task to DOM
@@ -190,6 +188,16 @@ button {
                 updateTasks()
             })
         })
+
+    let timer
+
+    // Handle window size
+    window.addEventListener('resize', event => {
+	clearTimeout(timer)
+	timer = setTimeout(() => {
+	    updateTasks()
+	}, 250)
+    })
 
     // Remove completed tasks from the DOM
     document.getElementById('clear')

@@ -20,28 +20,29 @@ var file = flag.String("c", "config.json", "Configuration filename")
 func main() {
 	flag.Parse()
 
-	c := Load(*file)
+	w, h, t := Load(*file)
 
-	w := webview.New(*debug)
-	defer w.Destroy()
+	wv := webview.New(*debug)
+	defer wv.Destroy()
 
-	w.SetTitle(fmt.Sprintf("DDE %s", Version))
-	w.SetSize(c.W, c.H, webview.HintNone)
+	wv.SetTitle(fmt.Sprintf("DDE %s", Version))
 
-	w.Bind("load", func() Tasks {
-		return c.Tasks
+	wv.SetSize(w, h, webview.HintNone)
+
+	wv.Bind("load", func() Tasks {
+		return t
 	})
 
-	w.Bind("update", func(config Config) {
-		config.Dump(*file)
+	wv.Bind("update", func(width, height int, tasks Tasks) {
+		Dump(*file, width, height, tasks)
 	})
 
-	w.Bind("terminate", func() {
-		w.Terminate()
+	wv.Bind("terminate", func() {
+		wv.Terminate()
 	})
 
-	w.Init(app)
+	wv.Init(app)
 
-	w.Navigate(`data:text/html,<!doctype html><html></html>`)
-	w.Run()
+	wv.Navigate("data:text/html,<!doctype html><html></html>")
+	wv.Run()
 }
