@@ -2,47 +2,115 @@ package main
 
 import (
 	_ "embed"
+	"encoding/json"
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/webview/webview"
 )
 
-// Version Program version
-var Version = "development"
+const (
+	// DefaultWidth Default window width
+	DefaultWidth = 800
+
+	// DefaultHeight Default window height
+	DefaultHeight = 600
+)
+
+// Input Application input file
+type Input struct {
+	Width  int   `json:"width"`
+	Height int   `json:"height"`
+	Tasks  Tasks `json:"tasks"`
+}
+
+// Tasks All tasks
+type Tasks struct {
+	Do       []*Task `json:"do"`
+	Schedule []*Task `json:"schedule"`
+	Delegate []*Task `json:"delegate"`
+	Cancel   []*Task `json:"cancel"`
+}
+
+// Task A task
+type Task struct {
+	Checked bool   `json:"checked"`
+	Label   string `json:"label"`
+}
+
+var (
+	// Version Program version
+	Version = "development"
+
+	// Debug Debug mode ?
+	Debug = flag.Bool("d", false, "Debug mode")
+
+	// Filename Input filename
+	Filename = flag.String("f", "dde.json", "Input file")
+)
 
 //go:embed app.js
 var app string
 
-var debug = flag.Bool("d", false, "Debug mode")
-var file = flag.String("c", "config.json", "Configuration filename")
+func load() (int, int, Tasks) {
+	input := Input{}
+
+	data, err := os.ReadFile(*Filename)
+	if err != nil {
+		return DefaultWidth, DefaultHeight, Tasks{}
+	}
+
+	err = json.Unmarshal(data, &input)
+	if err != nil {
+		return DefaultWidth, DefaultHeight, Tasks{}
+	}
+
+	if input.Width == 0 || input.Height == 0 {
+		return DefaultWidth, DefaultHeight, input.Tasks
+	}
+
+	return input.Width, input.Height, input.Tasks
+}
+
+func dump(width, height int, tasks Tasks) {
+	input := Input{
+		Width:  width,
+		Height: height,
+		Tasks:  tasks,
+	}
+
+	data, err := json.Marshal(input)
+	if err != nil {
+		return
+	}
+
+	os.WriteFile(*Filename, data, 0644)
+}
 
 func main() {
 	flag.Parse()
 
-	w, h, t := Load(*file)
+	width, height, tasks := load()
 
-	wv := webview.New(*debug)
-	defer wv.Destroy()
+	w := webview.New(*Debug)
+	defer w.Destroy()
 
-	wv.SetTitle(fmt.Sprintf("DDE %s", Version))
+	w.SetTitle(fmt.Sprintf("DDE %s", Version))
+	w.SetSize(width, height, webview.HintNone)
 
-	wv.SetSize(w, h, webview.HintNone)
-
-	wv.Bind("load", func() Tasks {
-		return t
+	w.Bind("load", func() Tasks {
+		return tasks
 	})
 
-	wv.Bind("update", func(width, height int, tasks Tasks) {
-		Dump(*file, width, height, tasks)
+	w.Bind("update", dump)
+
+	w.Bind("terminate", func() {
+		w.Terminate()
 	})
 
-	wv.Bind("terminate", func() {
-		wv.Terminate()
-	})
+	w.Init(app)
 
-	wv.Init(app)
-
-	wv.Navigate("data:text/html,<!doctype html><html></html>")
-	wv.Run()
+	w.Navigate("data:text/html,<!doctype html><html></html>")
+	w.Run()
 }

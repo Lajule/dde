@@ -194,9 +194,7 @@ button {
     // Handle window size
     window.addEventListener('resize', event => {
 	clearTimeout(timer)
-	timer = setTimeout(() => {
-	    updateTasks()
-	}, 250)
+	timer = setTimeout(updateTasks, 250)
     })
 
     // Remove completed tasks from the DOM
