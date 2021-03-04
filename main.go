@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	// DefaultWidth Default window width
-	DefaultWidth = 800
+	// MinWidth Minimal window width
+	MinWidth = 800
 
-	// DefaultHeight Default window height
-	DefaultHeight = 600
+	// MinHeight Minimal window height
+	MinHeight = 600
 )
 
 // Input Application input file
@@ -58,16 +58,12 @@ func load() (int, int, Tasks) {
 
 	data, err := os.ReadFile(*Filename)
 	if err != nil {
-		return DefaultWidth, DefaultHeight, Tasks{}
+		return 0, 0, Tasks{}
 	}
 
 	err = json.Unmarshal(data, &input)
 	if err != nil {
-		return DefaultWidth, DefaultHeight, Tasks{}
-	}
-
-	if input.Width == 0 || input.Height == 0 {
-		return DefaultWidth, DefaultHeight, input.Tasks
+		return 0, 0, Tasks{}
 	}
 
 	return input.Width, input.Height, input.Tasks
@@ -93,24 +89,25 @@ func main() {
 
 	width, height, tasks := load()
 
-	w := webview.New(*Debug)
-	defer w.Destroy()
+	window := webview.New(*Debug)
+	defer window.Destroy()
 
-	w.SetTitle(fmt.Sprintf("DDE %s", Version))
-	w.SetSize(width, height, webview.HintNone)
+	window.SetTitle(fmt.Sprintf("DDE %s", Version))
+	window.SetSize(MinWidth, MinHeight, webview.HintMin)
+	window.SetSize(width, height, webview.HintNone)
 
-	w.Bind("load", func() Tasks {
+	window.Bind("load", func() Tasks {
 		return tasks
 	})
 
-	w.Bind("update", dump)
+	window.Bind("update", dump)
 
-	w.Bind("terminate", func() {
-		w.Terminate()
+	window.Bind("terminate", func() {
+		window.Terminate()
 	})
 
-	w.Init(app)
+	window.Init(app)
 
-	w.Navigate("data:text/html,<!doctype html><html></html>")
-	w.Run()
+	window.Navigate("data:text/html,<!doctype html><html></html>")
+	window.Run()
 }

@@ -1,4 +1,68 @@
 window.addEventListener('DOMContentLoaded', function(event) {
+    // Debounce timer
+    let timer
+
+    // Load tasks from file
+    function loadTasks() {
+        load()
+            .then(result => {
+                Object.keys(result)
+                    .forEach(id => {
+                        if (result[id]) {
+                            const tasks = document.querySelector(`#${id} > .tasks`)
+                            result[id].forEach(task => {
+                                tasks.appendChild(newTask(task.checked, task.label))
+                            })
+                        }
+                    })
+            })
+    }
+
+    // Persist changes into file
+    function updateTasks() {
+        update(window.innerWidth,
+            window.innerHeight,
+            Array.from(document.querySelectorAll('.tasks'))
+                .reduce((accumulator, current) => {
+                    accumulator[current.parentNode.id] = Array.from(current.childNodes)
+                        .map(task => {
+                            return {
+                                checked: task.childNodes[0].checked,
+                                label: task.childNodes[1].innerHTML
+                            }
+                        })
+                    return accumulator
+                }, {}))
+    }
+
+    // Add new task to DOM
+    function newTask(checked, text) {
+        const div = document.createElement('div')
+        div.id = '_' + Math.random()
+            .toString(36)
+            .substr(2, 9)
+        // Allow drag
+        div.draggable = true
+        div.addEventListener('dragstart', event => {
+            event.dataTransfer.setData('text/plain', event.target.id)
+        })
+        const box = document.createElement('input')
+        box.id = '_' + Math.random()
+            .toString(36)
+            .substr(2, 9)
+        box.type = 'checkbox'
+        box.checked = checked
+        box.addEventListener('change', event => {
+            updateTasks()
+        })
+        div.appendChild(box)
+        const label = document.createElement('label')
+        label.htmlFor = box.id
+        label.innerHTML = text
+        div.appendChild(label)
+        return div
+    }
+
     // Add DOM elements first
     document.body.innerHTML = `
 <style>
@@ -95,67 +159,6 @@ button {
   <button id=clear>Clear</button>
 </div>`
 
-    // Load tasks from file
-    function loadTasks() {
-        load()
-            .then(result => {
-                Object.keys(result)
-                    .forEach(id => {
-                        if (result[id]) {
-                            const tasks = document.querySelector(`#${id} > .tasks`)
-                            result[id].forEach(task => {
-                                tasks.appendChild(newTask(task.checked, task.label))
-                            })
-                        }
-                    })
-            })
-    }
-
-    // Persist changes into file
-    function updateTasks() {
-        update(window.innerWidth,
-	       window.innerHeight,
-	       Array.from(document.querySelectorAll('.tasks'))
-	       .reduce((accumulator, current) => {
-                   accumulator[current.parentNode.id] = Array.from(current.childNodes)
-		       .map(task => {
-                           return {
-			       checked: task.childNodes[0].checked,
-			       label: task.childNodes[1].innerHTML
-                           }
-		       })
-                   return accumulator
-	       }, {}))
-    }
-
-    // Add new task to DOM
-    function newTask(checked, text) {
-        const div = document.createElement('div')
-        div.id = '_' + Math.random()
-            .toString(36)
-            .substr(2, 9)
-        // Allow drag
-        div.draggable = true
-        div.addEventListener('dragstart', event => {
-            event.dataTransfer.setData('text/plain', event.target.id)
-        })
-        const box = document.createElement('input')
-        box.id = '_' + Math.random()
-            .toString(36)
-            .substr(2, 9)
-        box.type = 'checkbox'
-        box.checked = checked
-        box.addEventListener('change', event => {
-            updateTasks()
-        })
-        div.appendChild(box)
-        const label = document.createElement('label')
-        label.htmlFor = box.id
-        label.innerHTML = text
-        div.appendChild(label)
-        return div
-    }
-
     document.querySelectorAll('.tasks')
         .forEach(tasks => {
             const button = tasks.parentNode.getElementsByTagName('button')[0]
@@ -189,12 +192,10 @@ button {
             })
         })
 
-    let timer
-
     // Handle window size
     window.addEventListener('resize', event => {
-	clearTimeout(timer)
-	timer = setTimeout(updateTasks, 250)
+        clearTimeout(timer)
+        timer = setTimeout(updateTasks, 250)
     })
 
     // Remove completed tasks from the DOM
