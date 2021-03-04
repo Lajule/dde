@@ -61,8 +61,7 @@ func load() (int, int, Tasks) {
 		return 0, 0, Tasks{}
 	}
 
-	err = json.Unmarshal(data, &input)
-	if err != nil {
+	if err = json.Unmarshal(data, &input); err != nil {
 		return 0, 0, Tasks{}
 	}
 
