@@ -159,6 +159,12 @@ button {
   <button id=clear>Clear</button>
 </div>`
 
+    // Handle window size
+    window.addEventListener('resize', event => {
+        clearTimeout(timer)
+        timer = setTimeout(updateTasks, 250)
+    })
+
     document.querySelectorAll('.tasks')
         .forEach(tasks => {
             const button = tasks.parentNode.getElementsByTagName('button')[0]
@@ -191,12 +197,6 @@ button {
                 updateTasks()
             })
         })
-
-    // Handle window size
-    window.addEventListener('resize', event => {
-        clearTimeout(timer)
-        timer = setTimeout(updateTasks, 250)
-    })
 
     // Remove completed tasks from the DOM
     document.getElementById('clear')
