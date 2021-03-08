@@ -101,12 +101,11 @@ func main() {
 
 	window.Bind("update", dump)
 
-	window.Bind("terminate", func() {
-		window.Terminate()
-	})
+	window.Bind("terminate", window.Terminate)
 
 	window.Init(app)
 
 	window.Navigate("data:text/html,<!doctype html><html></html>")
+
 	window.Run()
 }
