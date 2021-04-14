@@ -11,21 +11,21 @@ import (
 )
 
 const (
-	// MinWidth Minimal window width
+	// MinWidth is the minimal window width.
 	MinWidth = 800
 
-	// MinHeight Minimal window height
+	// MinHeight is the minimal window height.
 	MinHeight = 600
 )
 
-// Input Application input file
+// Input is used to load and save tasks.
 type Input struct {
 	Width  int   `json:"width"`
 	Height int   `json:"height"`
 	Tasks  Tasks `json:"tasks"`
 }
 
-// Tasks All tasks
+// Tasks gives access to all tasks.
 type Tasks struct {
 	Do       []*Task `json:"do"`
 	Schedule []*Task `json:"schedule"`
@@ -33,20 +33,20 @@ type Tasks struct {
 	Cancel   []*Task `json:"cancel"`
 }
 
-// Task A task
+// Task is a simple task.
 type Task struct {
 	Checked bool   `json:"checked"`
 	Label   string `json:"label"`
 }
 
 var (
-	// Version Program version
+	// Version contains the program version.
 	Version = "development"
 
-	// Debug Debug mode ?
+	// Debug activates the debug mode.
 	Debug = flag.Bool("d", false, "Debug mode")
 
-	// Filename Input filename
+	// Filename contains the input filename.
 	Filename = flag.String("f", "dde.json", "Input file")
 )
 
