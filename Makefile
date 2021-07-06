@@ -23,19 +23,13 @@ test:
 
 bootstrap:
 	echo 'tmp_dir = ".tmp"\n\n[build]\ncmd = "make"\nbin = "$(NAME)"\ninclude_ext = ["go"]\nexclude_dir = []\ninclude_dir = []\nexclude_file = []\n\n[misc]\nclean_on_exit = true' >.air.toml
-	for subdir in $(SUBDIRS); do \
-		for dir in $$(find $$subdir -type d); do \
-			echo 'TARGETS := $(TARGETS)\n\n$$(TARGETS):\n\t$$(MAKE) -C .. $$@\n\n.PHONY = $$(TARGETS)' >$$dir/Makefile; \
-		done \
-	done
+	find . -mindepth 1 -type d -exec sh -c "echo 'TARGETS := $(TARGETS)\n\n\$$(TARGETS):\n\t\$$(MAKE) -C .. \$$@\n\n.PHONY = \$$(TARGETS)' >{}/Makefile" \;
 
 lint:
 	golint ./...
 
 format:
-	for file in $$(find . -type f -name "*.go"); do \
-		gofmt -s -w $$file; \
-	done
+	find . -type f -name "*.go" -exec gofmt -s -w {} \;
 
 tarball:
 	touch tarball.tar.gz
