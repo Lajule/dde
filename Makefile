@@ -1,7 +1,7 @@
 NAME := dde
 PACKAGE := github.com/Lajule/dde
 VERSION := 0.0.1
-TARGETS := all run debug watch generate test bootstrap lint format tarball clean clean-test
+TARGETS := all run debug watch generate tidy test bootstrap lint format dist clean clean-test
 
 all:
 	go build -ldflags="-s -X 'main.Version=$(VERSION)'" -tags "$(GOTAGS)" -o $(NAME) .
@@ -18,12 +18,15 @@ watch:
 generate:
 	go generate
 
+tidy:
+	go mod tidy
+
 test:
 	go test -tags "$(GOTAGS)" -v ./...
 
 bootstrap:
-	echo 'tmp_dir = ".tmp"\n\n[build]\ncmd = "make"\nbin = "$(NAME)"\ninclude_ext = ["go"]\nexclude_dir = []\ninclude_dir = []\nexclude_file = []\n\n[misc]\nclean_on_exit = true' >.air.toml
-	find . -mindepth 1 -type d -exec sh -c "echo 'TARGETS := $(TARGETS)\n\n\$$(TARGETS):\n\t\$$(MAKE) -C .. \$$@\n\n.PHONY = \$$(TARGETS)' >{}/Makefile" \;
+	echo "tmp_dir = \".tmp\"\n\n[build]\ncmd = \"make\"\nbin = \"$(NAME)\"\ninclude_ext = [\"go\"]\nexclude_dir = []\ninclude_dir = []\nexclude_file = []\n\n[misc]\nclean_on_exit = true" >.air.toml
+	find . -mindepth 1 -type d -exec sh -c "echo \"$(TARGETS):\n\t\\\$$(MAKE) -C .. \\\$$@\n\n.PHONY = $(TARGETS)\" >{}/Makefile" \;
 
 lint:
 	golint ./...
@@ -31,7 +34,7 @@ lint:
 format:
 	find . -type f -name "*.go" -exec gofmt -s -w {} \;
 
-tarball:
+dist:
 	touch tarball.tar.gz
 	tar -czf tarball.tar.gz --exclude=tarball.tar.gz .
 
