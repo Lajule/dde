@@ -25,7 +25,6 @@ test:
 	go test -tags "$(GOTAGS)" -v ./...
 
 bootstrap:
-	echo "tmp_dir = \".tmp\"\n\n[build]\ncmd = \"make\"\nbin = \"$(NAME)\"\ninclude_ext = [\"go\"]\nexclude_dir = []\ninclude_dir = []\nexclude_file = []\n\n[misc]\nclean_on_exit = true" >.air.toml
 	find . -mindepth 1 -type d -exec sh -c "echo \"$(TARGETS):\n\t\\\$$(MAKE) -C .. \\\$$@\n\n.PHONY = $(TARGETS)\" >{}/Makefile" \;
 
 lint:
@@ -35,8 +34,8 @@ format:
 	find . -type f -name "*.go" -exec gofmt -s -w {} \;
 
 dist:
-	touch tarball.tar.gz
-	tar -czf tarball.tar.gz --exclude=tarball.tar.gz .
+	touch $(NAME).tar.gz
+	tar -czf $(NAME).tar.gz --exclude=$(NAME).tar.gz .
 
 clean: clean-test
 	$(RM) $(NAME)
