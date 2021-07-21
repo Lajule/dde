@@ -34,8 +34,7 @@ format:
 	find . -type f -name "*.go" -exec gofmt -s -w {} \;
 
 dist:
-	touch $(NAME).tar.gz
-	tar -czf $(NAME).tar.gz --exclude=$(NAME).tar.gz .
+	touch $(NAME).tar.gz && tar -czf $(NAME).tar.gz --exclude=$(NAME).tar.gz .
 
 clean: clean-test
 	$(RM) $(NAME)
